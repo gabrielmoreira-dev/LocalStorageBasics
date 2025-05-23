@@ -6,14 +6,16 @@ struct ContentView: View {
         TabView {
             NavigationView {
                 UserDeafultsView()
-                    .tabItem {
-                        Label("User Defaults", systemImage: "person.circle.fill")
-                    }
             }
-            Text("World")
-                .tabItem {
-                    Label("Core Data", systemImage: "tablecells")
-                }
+            .tabItem {
+                Label("User Defaults", systemImage: "person.circle.fill")
+            }
+            NavigationView {
+                CoreDataView()
+            }
+            .tabItem {
+                Label("Core Data", systemImage: "tablecells")
+            }
         }
     }
 }
