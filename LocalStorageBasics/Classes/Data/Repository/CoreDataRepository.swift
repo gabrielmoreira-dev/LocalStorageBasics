@@ -1,7 +1,7 @@
 protocol CoreDataRepositoryType {
     func addFruit(_ name: String) throws
     func fetchFruits() throws -> [FruitEntity]
-    func deleteFruit() throws
+    func deleteFruit(_ fruit: FruitEntity) throws
 }
 
 final class CoreDataRepository {
@@ -18,10 +18,10 @@ extension CoreDataRepository: CoreDataRepositoryType {
     }
     
     func fetchFruits() throws -> [FruitEntity] {
-        return try dataSource.fetch()
+        try dataSource.fetch()
     }
     
-    func deleteFruit() throws {
-
+    func deleteFruit(_ fruit: FruitEntity) throws {
+        try dataSource.delete(fruit)
     }
 }

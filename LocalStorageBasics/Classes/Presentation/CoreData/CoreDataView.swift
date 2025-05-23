@@ -23,11 +23,9 @@ struct CoreDataView: View {
                 ForEach(viewModel.fruits) {
                     Text($0.name ?? "Empty name")
                 }
+                .onDelete(perform: viewModel.deleteFruit)
             }
             .listStyle(PlainListStyle())
-            .onAppear() {
-                getValues()
-            }
         }
         .padding(.horizontal)
         .navigationTitle("Core Data")
@@ -37,10 +35,6 @@ struct CoreDataView: View {
         guard !input.isEmpty else { return }
         viewModel.addFruit(name: input)
         input = String()
-    }
-
-    private func getValues() {
-        viewModel.fetchFruits()
     }
 }
 

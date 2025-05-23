@@ -3,7 +3,7 @@ import CoreData
 protocol CoreDataSourceType {
     func add(_ name: String) throws
     func fetch() throws -> [FruitEntity]
-    func delete() throws
+    func delete(_ entity: FruitEntity) throws
 }
 
 final class CoreDataSource {
@@ -50,7 +50,14 @@ extension CoreDataSource: CoreDataSourceType {
         }
     }
     
-    func delete() throws {
-
+    func delete(_ entity: FruitEntity) throws {
+        container.viewContext.delete(entity)
+        do {
+            try container.viewContext.save()
+            debugPrint("[FruitCoreDataSource] - Delete data: \(entity)")
+        } catch {
+            debugPrint("[FruitCoreDataSource] - Error deleting data: \(error)")
+            throw error
+        }
     }
 }
