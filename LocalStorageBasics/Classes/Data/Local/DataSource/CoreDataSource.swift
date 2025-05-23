@@ -1,9 +1,9 @@
 import CoreData
 
 protocol CoreDataSourceType {
-    func add(_ name: String) throws
-    func fetch() throws -> [FruitEntity]
-    func delete(_ entity: FruitEntity) throws
+    func add<T: NSManagedObject>(_ dataCompletion: (T) -> Void) throws
+    func fetch<T: NSManagedObject>() throws -> [T]
+    func delete<T: NSManagedObject>(_ entity: T) throws
 }
 
 final class CoreDataSource {
@@ -13,10 +13,10 @@ final class CoreDataSource {
         self.container = container
         container.loadPersistentStores { description, error in
             if let error {
-                debugPrint("[FruitCoreDataSource] - Error loading Core Data: \(error)")
+                debugPrint("[CoreDataSource] - Error loading Core Data: \(error)")
                 return
             }
-            debugPrint("[FruitCoreDataSource] - Successfully loaded Core Data")
+            debugPrint("[CoreDataSource] - Successfully loaded Core Data")
         }
     }
 
@@ -26,37 +26,37 @@ final class CoreDataSource {
 }
 
 extension CoreDataSource: CoreDataSourceType {
-    func add(_ name: String) throws {
-        let fruit = FruitEntity(context: container.viewContext)
-        fruit.name = name
+    func add<T: NSManagedObject>(_ dataCompletion: (T) -> Void) throws {
+        let entity = T.init(context: container.viewContext)
+        dataCompletion(entity)
         do {
             try container.viewContext.save()
-            debugPrint("[FruitCoreDataSource] - Add data")
+            debugPrint("[CoreDataSource] - Add data")
         } catch {
-            debugPrint("[FruitCoreDataSource] - Error adding data: \(error)")
+            debugPrint("[CoreDataSource] - Error adding data: \(error)")
             throw error
         }
     }
     
-    func fetch() throws -> [FruitEntity] {
-        let request = NSFetchRequest<FruitEntity>(entityName: "FruitEntity")
+    func fetch<T: NSManagedObject>() throws -> [T] {
+        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
         do {
             let result = try container.viewContext.fetch(request)
-            debugPrint("[FruitCoreDataSource] - Fetch data: \(result)")
+            debugPrint("[CoreDataSource] - Fetch data: \(result)")
             return result
         } catch {
-            debugPrint("[FruitCoreDataSource] - Error fetching data: \(error)")
+            debugPrint("[CoreDataSource] - Error fetching data: \(error)")
             throw error
         }
     }
     
-    func delete(_ entity: FruitEntity) throws {
+    func delete<T: NSManagedObject>(_ entity: T) throws {
         container.viewContext.delete(entity)
         do {
             try container.viewContext.save()
-            debugPrint("[FruitCoreDataSource] - Delete data: \(entity)")
+            debugPrint("[CoreDataSource] - Delete data: \(entity)")
         } catch {
-            debugPrint("[FruitCoreDataSource] - Error deleting data: \(error)")
+            debugPrint("[CoreDataSource] - Error deleting data: \(error)")
             throw error
         }
     }

@@ -14,7 +14,9 @@ final class CoreDataRepository {
 
 extension CoreDataRepository: CoreDataRepositoryType {
     func addFruit(_ name: String) throws {
-        try dataSource.add(name)
+        try dataSource.add() { (entity: FruitEntity) in
+            entity.name = name
+        }
     }
     
     func fetchFruits() throws -> [FruitEntity] {
