@@ -5,16 +5,26 @@ import SwiftUI
 final class CoreDataViewModel {
     private let repository: CoreDataRepositoryType
     private(set) var fruits: [FruitEntity] = []
+    var input = String()
+    var search = String()
 
     init(repository: CoreDataRepositoryType = CoreDataRepository()) {
         self.repository = repository
         fetchFruits()
     }
 
-    func addFruit(name: String) {
+    func addFruit() {
+        guard !input.isEmpty else { return }
         do {
-            try repository.addFruit(name)
+            try repository.addFruit(input)
             fetchFruits()
+            input = String()
+        } catch { }
+    }
+
+    func fetchFruits() {
+        do {
+            fruits = try repository.fetchFruits(matching: search)
         } catch { }
     }
 
@@ -24,12 +34,6 @@ final class CoreDataViewModel {
         do {
             try repository.deleteFruit(fruit)
             fetchFruits()
-        } catch { }
-    }
-
-    private func fetchFruits() {
-        do {
-            fruits = try repository.fetchFruits()
         } catch { }
     }
 }

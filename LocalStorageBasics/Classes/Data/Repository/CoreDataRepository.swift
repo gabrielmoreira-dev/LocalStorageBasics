@@ -1,6 +1,6 @@
 protocol CoreDataRepositoryType {
     func addFruit(_ name: String) throws
-    func fetchFruits() throws -> [FruitEntity]
+    func fetchFruits(matching name: String?) throws -> [FruitEntity]
     func deleteFruit(_ fruit: FruitEntity) throws
 }
 
@@ -19,8 +19,11 @@ extension CoreDataRepository: CoreDataRepositoryType {
         }
     }
     
-    func fetchFruits() throws -> [FruitEntity] {
-        try dataSource.fetch()
+    func fetchFruits(matching name: String?) throws -> [FruitEntity] {
+        let clauses: [String: String] = if let name, !name.isEmpty {
+            ["name BEGINSWITH[c] %@": name]
+        } else { [:] }
+        return try dataSource.fetch(clauses)
     }
     
     func deleteFruit(_ fruit: FruitEntity) throws {

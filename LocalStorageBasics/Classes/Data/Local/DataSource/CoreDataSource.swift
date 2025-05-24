@@ -2,7 +2,7 @@ import CoreData
 
 protocol CoreDataSourceType {
     func add<T: NSManagedObject>(_ dataCompletion: (T) -> Void) throws
-    func fetch<T: NSManagedObject>() throws -> [T]
+    func fetch<T: NSManagedObject>(_ clauses: [String: String]) throws -> [T]
     func delete<T: NSManagedObject>(_ entity: T) throws
 }
 
@@ -38,8 +38,13 @@ extension CoreDataSource: CoreDataSourceType {
         }
     }
     
-    func fetch<T: NSManagedObject>() throws -> [T] {
+    func fetch<T: NSManagedObject>(_ clauses: [String: String] = [:]) throws -> [T] {
         let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+        if !clauses.isEmpty {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: clauses.map({
+                NSPredicate(format: $0, $1)
+            }))
+        }
         do {
             let result = try container.viewContext.fetch(request)
             debugPrint("[CoreDataSource] - Fetch data: \(result)")
